@@ -1,0 +1,513 @@
+zabbix_export:
+  version: '7.0'
+  template_groups:
+    - uuid: 7a5ff5d75c5947408857145009893df1
+      name: Templates/Operating systems
+  templates:
+    - uuid: 69407985c9114de1986bb1e923ac2b5e
+      template: UGREEN NAS UGOS Pro by Zabbix agent active
+      name: UGREEN NAS UGOS Pro by Zabbix agent active
+      description: Master template (Active Checks) for monitoring UGREEN NAS running UGOS Pro operating system. Includes full automatic host inventory populating OS, Hardware model, Serial Numbers, MAC, IP, Gateway, Vendor, Architecture, and Kernel.
+      groups:
+        - name: Templates/Operating systems
+      templates:
+        - name: Template OS Linux by Zabbix agent active
+        - name: Template App Docker
+      items:
+        - uuid: 234c1b8059a0425c86ec73e1e55158de
+          name: 'UGOS: OS Version'
+          type: ZABBIX_ACTIVE
+          key: ugos.version
+          delay: 1h
+          history: 30d
+          trends: '0'
+          value_type: TEXT
+          inventory_link: OS_FULL
+          description: UGOS Pro operating system version.
+        - uuid: 650eb8c1eed44e868388066fd49c2047
+          name: 'UGOS: Hardware Model'
+          type: ZABBIX_ACTIVE
+          key: ugos.model
+          delay: 1h
+          history: 30d
+          trends: '0'
+          value_type: TEXT
+          inventory_link: MODEL
+          description: NAS hardware model name.
+        - uuid: 16f4d36e00de4e5ea46d62f19429637d
+          name: 'UGOS: Serial Number'
+          type: ZABBIX_ACTIVE
+          key: ugos.serial
+          delay: 1h
+          history: 30d
+          trends: '0'
+          value_type: TEXT
+          inventory_link: SERIALNO_A
+          description: NAS hardware serial number.
+        - uuid: eb38c373a77841608de8f2d5294c34ef
+          name: 'UGOS: MAC Address'
+          type: ZABBIX_ACTIVE
+          key: ugos.mac
+          delay: 1h
+          history: 30d
+          trends: '0'
+          value_type: TEXT
+          inventory_link: MACADDRESS_A
+          description: Primary network interface MAC address.
+        - uuid: 08223d10a3fb43789b2b89ac7bb9b625
+          name: 'UGOS: Architecture'
+          type: ZABBIX_ACTIVE
+          key: ugos.arch
+          delay: 1h
+          history: 30d
+          trends: '0'
+          value_type: TEXT
+          inventory_link: HARDWARE
+          description: CPU architecture (x86_64 / arm64).
+        - uuid: b37d05ca232245228a596738405a3108
+          name: 'UGOS: Hardware Vendor'
+          type: ZABBIX_ACTIVE
+          key: ugos.vendor
+          delay: 1h
+          history: 30d
+          trends: '0'
+          value_type: TEXT
+          inventory_link: VENDOR
+          description: Hardware manufacturer name.
+        - uuid: d8f3efb03a604f7cbb72ac341d0c66e9
+          name: 'UGOS: BIOS Release Date'
+          type: ZABBIX_ACTIVE
+          key: ugos.bios.date
+          delay: 1h
+          history: 30d
+          trends: '0'
+          value_type: TEXT
+          inventory_link: DATE_HW_INSTALL
+          description: System BIOS release date.
+        - uuid: 7558a85f175f4fd687b8962e72705631
+          name: 'UGOS: Primary IP Address'
+          type: ZABBIX_ACTIVE
+          key: ugos.ip
+          delay: 1h
+          history: 30d
+          trends: '0'
+          value_type: TEXT
+          inventory_link: OOB_IP
+          description: Primary IP address of the NAS.
+        - uuid: ac52da7d9ab14fb082c4ba0554683be4
+          name: 'UGOS: Default Gateway'
+          type: ZABBIX_ACTIVE
+          key: ugos.gateway
+          delay: 1h
+          history: 30d
+          trends: '0'
+          value_type: TEXT
+          inventory_link: OOB_ROUTER
+          description: Default network gateway IP.
+        - uuid: eba2376c9e134bc495641778fc8cc171
+          name: 'UGOS: Linux Kernel Release'
+          type: ZABBIX_ACTIVE
+          key: ugos.kernel
+          delay: 1h
+          history: 30d
+          trends: '0'
+          value_type: TEXT
+          inventory_link: OS_SHORT
+          description: Operating system Linux kernel release string.
+        - uuid: 78ea0614851a4ecca8d6173ed7c568ee
+          name: 'UGOS: Motherboard Temperature'
+          type: ZABBIX_ACTIVE
+          key: ugos.board.temp[1]
+          delay: 1m
+          history: 7d
+          value_type: FLOAT
+          units: °C
+          description: System motherboard thermal sensor temperature.
+        - uuid: 0283e650caa44e46a01e6c2be6dc1f0e
+          name: 'UGOS: RAID Degraded Arrays'
+          type: ZABBIX_ACTIVE
+          key: ugos.mdstat.degraded
+          delay: 1m
+          history: 7d
+          value_type: UNSIGNED
+          description: Number of degraded Linux Software RAID arrays.
+        - uuid: 1d5d363b5e174966a9558347fdb06275
+          name: 'UGOS: Btrfs Errors Volume 1'
+          type: ZABBIX_ACTIVE
+          key: ugos.btrfs.errors[1]
+          delay: 5m
+          history: 7d
+          value_type: UNSIGNED
+          description: Number of recorded Btrfs filesystem errors on volume 1.
+      discovery_rules:
+        - uuid: 3a8933a16c3d4792bfb15b9834705e9e
+          name: 'UGOS: RAID Arrays Discovery'
+          type: ZABBIX_ACTIVE
+          key: ugos.mdstat.discovery
+          delay: 1h
+          item_prototypes:
+            - uuid: 74f363a3bee64cf89a2829e5ccb779fd
+              name: 'UGOS: {#VOLNAME} ({#MDNAME} - {#MDLEVEL}) Degraded State'
+              type: ZABBIX_ACTIVE
+              key: 'ugos.mdstat.degraded[{#MDNAME}]'
+              delay: 1m
+              history: 7d
+              value_type: UNSIGNED
+              description: 'Degraded state of {#VOLNAME} ({#MDNAME}). Returns 0 if healthy, 1 if degraded.'
+              trigger_prototypes:
+                - uuid: 6c81f20ce9d04a6fa859c82bb3a5228a
+                  expression: 'last(/UGREEN NAS UGOS Pro by Zabbix agent active/ugos.mdstat.degraded[{#MDNAME}])>0'
+                  name: 'UGOS: {#VOLNAME} ({#MDNAME} - {#MDLEVEL}) is degraded!'
+                  priority: HIGH
+                  description: 'Software RAID array {#VOLNAME} ({#MDNAME} - {#MDLEVEL}) is degraded!'
+        - uuid: 9e2ed1c476914b1fbd578f24702d0a81
+          name: 'UGOS: Cooling Fans Discovery'
+          type: ZABBIX_ACTIVE
+          key: ugos.fan.discovery
+          delay: 1h
+          item_prototypes:
+            - uuid: ea083bd529884f93a8a57352c06be78a
+              name: 'UGOS: {#FANNAME} Speed'
+              type: ZABBIX_ACTIVE
+              key: 'ugos.fan.speed[{#FANKEY}]'
+              delay: 1m
+              history: 7d
+              value_type: FLOAT
+              units: rpm
+              description: 'Rotation speed of {#FANNAME} in RPM.'
+      dashboards:
+        - uuid: 780abc650bef475f9aeb94398dcdf84c
+          name: 'UGREEN NAS UGOS Pro Task Manager'
+          pages:
+            - name: 'Overview'
+              widgets:
+                - type: item
+                  name: 'Hardware Model'
+                  x: '0'
+                  y: '0'
+                  width: '6'
+                  height: '3'
+                  fields:
+                    - type: ITEM
+                      name: itemid
+                      value:
+                        key: ugos.model
+                        host: 'UGREEN NAS UGOS Pro by Zabbix agent active'
+                    - type: INTEGER
+                      name: show.0
+                      value: '2'
+                    - type: INTEGER
+                      name: value_size
+                      value: '18'
+                - type: item
+                  name: 'UGOS OS Version'
+                  x: '6'
+                  y: '0'
+                  width: '6'
+                  height: '3'
+                  fields:
+                    - type: ITEM
+                      name: itemid
+                      value:
+                        key: ugos.version
+                        host: 'UGREEN NAS UGOS Pro by Zabbix agent active'
+                    - type: INTEGER
+                      name: show.0
+                      value: '2'
+                    - type: INTEGER
+                      name: value_size
+                      value: '18'
+                - type: gauge
+                  name: 'Motherboard Temp'
+                  x: '12'
+                  y: '0'
+                  width: '6'
+                  height: '3'
+                  fields:
+                    - type: ITEM
+                      name: itemid
+                      value:
+                        key: 'ugos.board.temp[1]'
+                        host: 'UGREEN NAS UGOS Pro by Zabbix agent active'
+                    - type: STRING
+                      name: min
+                      value: '0'
+                    - type: STRING
+                      name: max
+                      value: '100'
+                - type: item
+                  name: 'System Uptime'
+                  x: '18'
+                  y: '0'
+                  width: '6'
+                  height: '3'
+                  fields:
+                    - type: ITEM
+                      name: itemid
+                      value:
+                        key: system.uptime
+                        host: 'UGREEN NAS UGOS Pro by Zabbix agent active'
+                    - type: INTEGER
+                      name: show.0
+                      value: '2'
+                    - type: INTEGER
+                      name: value_size
+                      value: '18'
+                - type: svggraph
+                  name: 'CPU Utilization %'
+                  x: '0'
+                  y: '3'
+                  width: '24'
+                  height: '5'
+                  fields:
+                    - type: STRING
+                      name: ds.0.items.0
+                      value: 'system.cpu.util*'
+                    - type: STRING
+                      name: ds.0.color
+                      value: 1976D2
+                    - type: INTEGER
+                      name: ds.0.fill
+                      value: '3'
+                    - type: INTEGER
+                      name: ds.0.width
+                      value: '2'
+                - type: problems
+                  name: 'Active System Alerts & Status'
+                  x: '0'
+                  y: '8'
+                  width: '24'
+                  height: '5'
+                  fields:
+                    - type: INTEGER
+                      name: show_lines
+                      value: '10'
+            - name: 'Disks & Storage'
+              widgets:
+                - type: item
+                  name: 'RAID Degraded Arrays'
+                  x: '0'
+                  y: '0'
+                  width: '12'
+                  height: '3'
+                  fields:
+                    - type: ITEM
+                      name: itemid
+                      value:
+                        key: ugos.mdstat.degraded
+                        host: 'UGREEN NAS UGOS Pro by Zabbix agent active'
+                    - type: INTEGER
+                      name: show.0
+                      value: '2'
+                    - type: INTEGER
+                      name: value_size
+                      value: '25'
+                    - type: INTEGER
+                      name: decimal_places
+                      value: '0'
+                - type: item
+                  name: 'Btrfs Errors (Volume 1)'
+                  x: '12'
+                  y: '0'
+                  width: '12'
+                  height: '3'
+                  fields:
+                    - type: ITEM
+                      name: itemid
+                      value:
+                        key: 'ugos.btrfs.errors[1]'
+                        host: 'UGREEN NAS UGOS Pro by Zabbix agent active'
+                    - type: INTEGER
+                      name: show.0
+                      value: '2'
+                    - type: INTEGER
+                      name: value_size
+                      value: '25'
+                    - type: INTEGER
+                      name: decimal_places
+                      value: '0'
+            - name: 'Docker'
+              widgets:
+                - type: item
+                  name: 'Running Containers'
+                  x: '0'
+                  y: '0'
+                  width: '8'
+                  height: '3'
+                  fields:
+                    - type: ITEM
+                      name: itemid
+                      value:
+                        key: docker.containers.running
+                        host: 'UGREEN NAS UGOS Pro by Zabbix agent active'
+                    - type: INTEGER
+                      name: show.0
+                      value: '2'
+                    - type: INTEGER
+                      name: value_size
+                      value: '25'
+                    - type: INTEGER
+                      name: decimal_places
+                      value: '0'
+                - type: item
+                  name: 'Stopped Containers'
+                  x: '8'
+                  y: '0'
+                  width: '8'
+                  height: '3'
+                  fields:
+                    - type: ITEM
+                      name: itemid
+                      value:
+                        key: docker.containers.stopped
+                        host: 'UGREEN NAS UGOS Pro by Zabbix agent active'
+                    - type: INTEGER
+                      name: show.0
+                      value: '2'
+                    - type: INTEGER
+                      name: value_size
+                      value: '25'
+                    - type: INTEGER
+                      name: decimal_places
+                      value: '0'
+                - type: item
+                  name: 'Total Docker Images'
+                  x: '16'
+                  y: '0'
+                  width: '8'
+                  height: '3'
+                  fields:
+                    - type: ITEM
+                      name: itemid
+                      value:
+                        key: docker.images.total
+                        host: 'UGREEN NAS UGOS Pro by Zabbix agent active'
+                    - type: INTEGER
+                      name: show.0
+                      value: '2'
+                    - type: INTEGER
+                      name: value_size
+                      value: '25'
+                    - type: INTEGER
+                      name: decimal_places
+                      value: '0'
+            - name: 'Network & Traffic'
+              widgets:
+                - type: item
+                  name: 'Primary IP Address'
+                  x: '0'
+                  y: '0'
+                  width: '6'
+                  height: '3'
+                  fields:
+                    - type: ITEM
+                      name: itemid
+                      value:
+                        key: ugos.ip
+                        host: 'UGREEN NAS UGOS Pro by Zabbix agent active'
+                    - type: INTEGER
+                      name: show.0
+                      value: '2'
+                    - type: INTEGER
+                      name: value_size
+                      value: '18'
+                - type: item
+                  name: 'Default Gateway'
+                  x: '6'
+                  y: '0'
+                  width: '6'
+                  height: '3'
+                  fields:
+                    - type: ITEM
+                      name: itemid
+                      value:
+                        key: ugos.gateway
+                        host: 'UGREEN NAS UGOS Pro by Zabbix agent active'
+                    - type: INTEGER
+                      name: show.0
+                      value: '2'
+                    - type: INTEGER
+                      name: value_size
+                      value: '18'
+                - type: item
+                  name: 'MAC Address'
+                  x: '12'
+                  y: '0'
+                  width: '6'
+                  height: '3'
+                  fields:
+                    - type: ITEM
+                      name: itemid
+                      value:
+                        key: ugos.mac
+                        host: 'UGREEN NAS UGOS Pro by Zabbix agent active'
+                    - type: INTEGER
+                      name: show.0
+                      value: '2'
+                    - type: INTEGER
+                      name: value_size
+                      value: '14'
+                - type: item
+                  name: 'Linux Kernel'
+                  x: '18'
+                  y: '0'
+                  width: '6'
+                  height: '3'
+                  fields:
+                    - type: ITEM
+                      name: itemid
+                      value:
+                        key: ugos.kernel
+                        host: 'UGREEN NAS UGOS Pro by Zabbix agent active'
+                    - type: INTEGER
+                      name: show.0
+                      value: '2'
+                    - type: INTEGER
+                      name: value_size
+                      value: '18'
+                - type: svggraph
+                  name: 'Network Interfaces Traffic'
+                  x: '0'
+                  y: '3'
+                  width: '24'
+                  height: '6'
+                  fields:
+                    - type: STRING
+                      name: ds.0.items.0
+                      value: '*Bits received'
+                    - type: STRING
+                      name: ds.0.color
+                      value: 43A047
+                    - type: INTEGER
+                      name: ds.0.fill
+                      value: '3'
+                    - type: STRING
+                      name: ds.1.items.0
+                      value: '*Bits sent'
+                    - type: STRING
+                      name: ds.1.color
+                      value: 1E88E5
+                    - type: INTEGER
+                      name: ds.1.fill
+                      value: '3'
+  triggers:
+    - uuid: 1314f747442f4cfd92ffaf642d8718d3
+      expression: last(/UGREEN NAS UGOS Pro by Zabbix agent active/ugos.mdstat.degraded)>0
+      name: 'UGOS: RAID array is in degraded state!'
+      priority: HIGH
+      description: One or more software RAID arrays on the NAS are degraded.
+    - uuid: a7969d656d4d467a80079392cca52e5e
+      expression: min(/UGREEN NAS UGOS Pro by Zabbix agent active/ugos.board.temp[1],5m)>65
+      name: 'UGOS: High Motherboard Temperature (>65°C)'
+      priority: WARNING
+      description: Motherboard temperature exceeded 65°C.
+    - uuid: b69cbafee7e54fd0b79943a7e13315a9
+      expression: last(/UGREEN NAS UGOS Pro by Zabbix agent active/ugos.btrfs.errors[1])>0
+      name: 'UGOS: Btrfs filesystem errors detected on Volume 1'
+      priority: AVERAGE
+      description: Btrfs volume 1 reports corrupt or uncorrectable sectors.
+    - uuid: edbbc995bf7342d5860a58a4eadaa7e9
+      expression: change(/UGREEN NAS UGOS Pro by Zabbix agent active/ugos.version)<>0
+      name: 'UGOS: Firmware OS version has been updated'
+      priority: INFO
+      description: UGOS Pro operating system version has changed.

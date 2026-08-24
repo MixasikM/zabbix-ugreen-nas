@@ -1,0 +1,30 @@
+services:
+  zabbix-agent2:
+    image: ghcr.io/mixasikm/zabbix-ugreen-nas:latest
+    container_name: zabbix-agent2
+    user: "0:0"
+    restart: always
+    network_mode: host
+    privileged: true
+    cap_add:
+      - SYS_RAWIO
+    volumes:
+      - /proc:/host/proc:ro
+      - /sys:/host/sys:ro
+      - /dev:/dev:ro
+      - /etc/os-release:/host/etc/os-release:ro
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      # Optional local volume mount for testing ugos.conf directly on host:
+      # - ./ugos.conf:/etc/zabbix/zabbix_agent2.d/plugins.d/ugos.conf:ro
+    environment:
+      ZBX_PASSIVESERVERS: "zabbix.example.com,192.168.1.X" # Allowed servers/proxies for incoming passive checks
+      ZBX_ACTIVESERVERS: "zabbix.example.com"              # Target server/proxy for outgoing active checks
+      ZBX_HOSTNAME: "Ugreen-NAS"                           # Hostname registered in Zabbix Frontend
+      ZBX_LISTENPORT: 10055                                # Agent Listen Port (prevents conflict with Zabbix Proxy)
+      ZBX_TIMEOUT: 20                                      # Extended timeout for S.M.A.R.T. and WAN checks
+
+      # --- Optional PSK Encryption ---
+      # ZBX_TLSCONNECT: "psk"                              # Encryption for outbound active checks
+      # ZBX_TLSACCEPT: "psk"                               # Encryption for inbound passive checks
+      # ZBX_TLSPSKIDENTITY: "PSK_Ugreen_NAS"               # PSK Identity Name registered in Zabbix Frontend
+      # ZBX_TLSPSKVALUE: "4210555551184425b819e3a513d6c0f64210555551184425b819e3a513d6c0f6" # 64-character hex key
